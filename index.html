@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Clkr</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+      #clickArea {
+        background-color: yellow;
+        height: 400px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2 id="userNo"></h2>
+    <h3>Leaderboard</h3>
+    <ol id="leaderboard"></ol>
+    <div id="clickArea"></div>
+
+    <script>
+      const socket = io();
+      
+      socket.on('id', id => {
+        document.getElementById('userNo').innerHTML = `User #${id}`;
+      });
+
+      socket.on('leaderboard', data => {
+        document.getElementById('leaderboard').innerHTML = null;
+        let sortedData = Object.entries(data).sort((a, b) => b[1] - a[1]);
+        for (let [user, count] of sortedData) {
+          const item = document.createElement('li');
+          item.innerHTML = `User ${user}: ${count}`;
+          document.getElementById('leaderboard').appendChild(item);
+        }
+      });
+
+      document.getElementById('clickArea')
+        .addEventListener('click', () => {
+          socket.emit('click');
+        });
+    </script>
+  </body>
+</html>
